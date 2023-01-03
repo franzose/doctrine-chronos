@@ -30,6 +30,11 @@ Now you can use these types in Doctrine entities:
 <?php
 declare(strict_types=1);
 
+use Cake\Chronos\ChronosInterface;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+
 #[Entity, Table(name: '"user"')]
 class User
 {
