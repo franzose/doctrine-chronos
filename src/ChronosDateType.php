@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Franzose\DoctrineChronos;
 
-use Cake\Chronos\Chronos;
+use Cake\Chronos\ChronosDate;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 
-final class ChronosType extends Type
+final class ChronosDateType extends Type
 {
-    public const NAME = 'chronos';
+    public const NAME = 'chronos_date';
 
     public function getName(): string
     {
@@ -23,30 +23,30 @@ final class ChronosType extends Type
             return $value;
         }
 
-        if ($value instanceof Chronos) {
-            return $value->format($platform->getDateTimeFormatString());
+        if ($value instanceof ChronosDate) {
+            return $value->format($platform->getDateFormatString());
         }
 
         throw ConversionException::conversionFailedInvalidType(
             $value,
             $this->getName(),
-            ['null', Chronos::class]
+            ['null', ChronosDate::class]
         );
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null || $value instanceof Chronos) {
+        if ($value === null || $value instanceof ChronosDate) {
             return $value;
         }
 
         try {
-            return Chronos::createFromFormat($platform->getDateTimeFormatString(), $value);
+             return ChronosDate::createFromFormat($platform->getDateFormatString(), $value);
         } catch (\Exception $ex) {
             throw ConversionException::conversionFailedFormat(
                 $value,
                 $this->getName(),
-                $platform->getDateTimeFormatString(),
+                $platform->getDateFormatString(),
                 $ex
             );
         }
@@ -54,7 +54,7 @@ final class ChronosType extends Type
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getDateTimeTypeDeclarationSQL($column);
+        return $platform->getDateTypeDeclarationSQL($column);
     }
 
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Franzose\DoctrineChronos\Tests;
 
 use Cake\Chronos\Chronos;
-use Cake\Chronos\ChronosInterface;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
@@ -16,7 +15,7 @@ final class ChronosTypeTest extends TestCase
     /**
      * @dataProvider getDataForConvertToDatabaseValueTest
      */
-    public function testConvertToDatabaseValue(?ChronosInterface $dateTime, ?string $expectedValue): void
+    public function testConvertToDatabaseValue(?Chronos $dateTime, ?string $expectedValue): void
     {
         $actualValue = self::getType()->convertToDatabaseValue($dateTime, new PostgreSQLPlatform());
 
@@ -48,8 +47,8 @@ final class ChronosTypeTest extends TestCase
      * @dataProvider getDataForConvertToPHPValueTest
      */
     public function testConvertToPHPValue(
-        ChronosInterface|string|null $dateTime,
-        ?ChronosInterface $expectedValue
+        Chronos|string|null $dateTime,
+        ?Chronos $expectedValue
     ): void {
         $actualValue = self::getType()->convertToPHPValue($dateTime, new PostgreSQLPlatform());
 
