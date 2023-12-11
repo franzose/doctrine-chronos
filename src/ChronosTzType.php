@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Franzose\DoctrineChronos;
 
 use Cake\Chronos\Chronos;
-use Cake\Chronos\ChronosInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
@@ -24,25 +23,25 @@ final class ChronosTzType extends Type
             return $value;
         }
 
-        if ($value instanceof ChronosInterface) {
+        if ($value instanceof Chronos) {
             return $value->format($platform->getDateTimeTzFormatString());
         }
 
         throw ConversionException::conversionFailedInvalidType(
             $value,
             $this->getName(),
-            ['null', ChronosInterface::class]
+            ['null', Chronos::class]
         );
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null || $value instanceof ChronosInterface) {
+        if ($value === null || $value instanceof Chronos) {
             return $value;
         }
 
         try {
-            $dateTime = Chronos::createFromFormat($platform->getDateTimeTzFormatString(), $value);
+            return Chronos::createFromFormat($platform->getDateTimeTzFormatString(), $value);
         } catch (\Exception $ex) {
             throw ConversionException::conversionFailedFormat(
                 $value,
@@ -51,8 +50,6 @@ final class ChronosTzType extends Type
                 $ex
             );
         }
-
-        return $dateTime;
     }
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string

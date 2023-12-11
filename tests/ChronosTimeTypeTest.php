@@ -3,21 +3,22 @@ declare(strict_types=1);
 
 namespace Franzose\DoctrineChronos\Tests;
 
-use Cake\Chronos\Chronos;
+use Cake\Chronos\ChronosTime;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
-use Franzose\DoctrineChronos\ChronosTzType;
+use Franzose\DoctrineChronos\ChronosTimeType;
+use Franzose\DoctrineChronos\ChronosType;
 use PHPUnit\Framework\TestCase;
 
-final class ChronosTzTypeTest extends TestCase
+final class ChronosTimeTypeTest extends TestCase
 {
     /**
      * @dataProvider getDataForConvertToDatabaseValueTest
      */
-    public function testConvertToDatabaseValue(?Chronos $dateTime, ?string $expectedValue): void
+    public function testConvertToDatabaseValue(?ChronosTime $time, ?string $expectedValue): void
     {
-        $actualValue = self::getType()->convertToDatabaseValue($dateTime, new PostgreSQLPlatform());
+        $actualValue = self::getType()->convertToDatabaseValue($time, new PostgreSQLPlatform());
 
         self::assertEquals($expectedValue, $actualValue);
     }
@@ -30,8 +31,8 @@ final class ChronosTzTypeTest extends TestCase
                 null
             ],
             [
-                Chronos::createFromFormat('d.m.Y H:i:s', '03.01.2022 11:22:33', '+00:00'),
-                '2022-01-03 11:22:33+0000'
+                new ChronosTime('11:45'),
+                '11:45:00'
             ]
         ];
     }
@@ -40,17 +41,17 @@ final class ChronosTzTypeTest extends TestCase
     {
         $this->expectException(ConversionException::class);
 
-        self::getType()->convertToDatabaseValue('03.01.2022 11:22:33', new PostgreSQLPlatform());
+        self::getType()->convertToDatabaseValue('11:45', new PostgreSQLPlatform());
     }
 
     /**
      * @dataProvider getDataForConvertToPHPValueTest
      */
     public function testConvertToPHPValue(
-        Chronos|string|null $dateTime,
-        ?Chronos $expectedValue
+        ChronosTime|string|null $time,
+        ?ChronosTime $expectedValue
     ): void {
-        $actualValue = self::getType()->convertToPHPValue($dateTime, new PostgreSQLPlatform());
+        $actualValue = self::getType()->convertToPHPValue($time, new PostgreSQLPlatform());
 
         self::assertEquals($expectedValue, $actualValue);
     }
@@ -63,12 +64,12 @@ final class ChronosTzTypeTest extends TestCase
                 null
             ],
             [
-                Chronos::createFromFormat('d.m.Y H:i:s', '03.01.2022 11:22:33', '+00:00'),
-                Chronos::createFromFormat('d.m.Y H:i:s', '03.01.2022 11:22:33', '+00:00')
+                new ChronosTime('11:45:23'),
+                new ChronosTime('11:45:23')
             ],
             [
-                '2022-01-03 11:22:33+00:00',
-                Chronos::createFromFormat('Y-m-d H:i:s', '2022-01-03 11:22:33', '+00:00')
+                '11:45',
+                new ChronosTime('11:45:00')
             ]
         ];
     }
@@ -80,12 +81,12 @@ final class ChronosTzTypeTest extends TestCase
         self::getType()->convertToPHPValue('Not a date/time value.', new PostgreSQLPlatform());
     }
 
-    private static function getType(): Type|ChronosTzType
+    private static function getType(): Type|ChronosType
     {
-        if (!Type::hasType(ChronosTzType::NAME)) {
-            Type::addType(ChronosTzType::NAME, ChronosTzType::class);
+        if (!Type::hasType(ChronosTimeType::NAME)) {
+            Type::addType(ChronosTimeType::NAME, ChronosTimeType::class);
         }
 
-        return Type::getType(ChronosTzType::NAME);
+        return Type::getType(ChronosTimeType::NAME);
     }
 }
